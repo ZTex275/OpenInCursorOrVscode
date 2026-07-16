@@ -24,6 +24,27 @@ namespace OpenInCursorOrVscode
                 return false;
             }
 
+            // 1. Уже запущенный Cursor — всегда приоритетнее.
+            if (IsProcessRunning("Cursor"))
+            {
+                string runningCursor = GetRunningProcessPath("Cursor") ?? FindCursor();
+                if (!string.IsNullOrEmpty(runningCursor))
+                {
+                    return Launch(runningCursor, filePath, "Cursor", out editorName, out errorMessage);
+                }
+            }
+
+            // 2. Уже запущенный VS Code.
+            if (IsProcessRunning("Code"))
+            {
+                string runningVsCode = GetRunningProcessPath("Code") ?? FindVsCode();
+                if (!string.IsNullOrEmpty(runningVsCode))
+                {
+                    return Launch(runningVsCode, filePath, "Visual Studio Code", out editorName, out errorMessage);
+                }
+            }
+
+            // 3. Ни один не запущен — сначала Cursor, затем VS Code.
             string cursorPath = FindCursor();
             if (!string.IsNullOrEmpty(cursorPath))
             {
@@ -38,6 +59,67 @@ namespace OpenInCursorOrVscode
 
             errorMessage = "Не найдены Cursor и Visual Studio Code. Установите один из редакторов.";
             return false;
+        }
+
+        private static bool IsProcessRunning(string processName)
+        {
+            try
+            {
+                Process[] processes = Process.GetProcessesByName(processName);
+                try
+                {
+                    return processes.Length > 0;
+                }
+                finally
+                {
+                    foreach (Process process in processes)
+                    {
+                        process.Dispose();
+                    }
+                }
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        private static string GetRunningProcessPath(string processName)
+        {
+            try
+            {
+                Process[] processes = Process.GetProcessesByName(processName);
+                try
+                {
+                    foreach (Process process in processes)
+                    {
+                        try
+                        {
+                            string path = process.MainModule?.FileName;
+                            if (!string.IsNullOrEmpty(path) && File.Exists(path))
+                            {
+                                return path;
+                            }
+                        }
+                        catch
+                        {
+                            // Нет доступа к MainModule у части процессов.
+                        }
+                    }
+                }
+                finally
+                {
+                    foreach (Process process in processes)
+                    {
+                        process.Dispose();
+                    }
+                }
+            }
+            catch
+            {
+            }
+
+            return null;
         }
 
         private static bool Launch(string executablePath, string filePath, string name, out string editorName, out string errorMessage)

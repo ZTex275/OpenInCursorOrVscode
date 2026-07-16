@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PackageManifest Version="2.0.0" xmlns="http://schemas.microsoft.com/developer/vsx-schema/2011" xmlns:d="http://schemas.microsoft.com/developer/vsx-schema-design/2011">
   <Metadata>
-    <Identity Id="OpenInCursorOrVscode.8F4E2A91-3C5D-4B7E-9A1F-6D2E8B4C7F30" Version="1.1.0" Language="ru-RU" Publisher="Local" />
+    <Identity Id="OpenInCursorOrVscode.8F4E2A91-3C5D-4B7E-9A1F-6D2E8B4C7F30" Version="1.1.1" Language="ru-RU" Publisher="Local" />
     <DisplayName>Открыть в Cursor или VS Code</DisplayName>
     <Description xml:space="preserve">Добавляет пункт контекстного меню редактора для открытия текущего файла в Cursor или Visual Studio Code.</Description>
     <Icon>Resources\Icon.png</Icon>
