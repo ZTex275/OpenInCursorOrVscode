@@ -1,5 +1,6 @@
 using System;
 using System.ComponentModel.Design;
+using System.IO;
 using EnvDTE;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
@@ -39,7 +40,7 @@ namespace OpenInCursorOrVscode
         {
             ThreadHelper.ThrowIfNotOnUIThread();
 
-            string filePath = GetActiveDocumentPath();
+            string filePath = GetTargetFilePath();
             if (!EditorOpener.TryOpen(filePath, out _, out string errorMessage))
             {
                 VsShellUtilities.ShowMessageBox(
@@ -52,16 +53,63 @@ namespace OpenInCursorOrVscode
             }
         }
 
-        private string GetActiveDocumentPath()
+        private string GetTargetFilePath()
         {
-            var dte = package.GetGlobalService(typeof(SDTE)) as DTE;
-            Document activeDocument = dte?.ActiveDocument;
+            ThreadHelper.ThrowIfNotOnUIThread();
+
+            var dte = Package.GetGlobalService(typeof(SDTE)) as DTE;
+            if (dte == null)
+            {
+                return null;
+            }
+
+            string selectedPath = GetSelectedItemPath(dte);
+            if (!string.IsNullOrWhiteSpace(selectedPath))
+            {
+                return selectedPath;
+            }
+
+            Document activeDocument = dte.ActiveDocument;
             if (activeDocument == null || string.IsNullOrWhiteSpace(activeDocument.FullName))
             {
                 return null;
             }
 
             return activeDocument.FullName;
+        }
+
+        private static string GetSelectedItemPath(DTE dte)
+        {
+            ThreadHelper.ThrowIfNotOnUIThread();
+
+            SelectedItems selectedItems = dte.SelectedItems;
+            if (selectedItems == null || selectedItems.Count == 0)
+            {
+                return null;
+            }
+
+            foreach (SelectedItem selectedItem in selectedItems)
+            {
+                ProjectItem projectItem = selectedItem?.ProjectItem;
+                if (projectItem == null)
+                {
+                    continue;
+                }
+
+                try
+                {
+                    string path = projectItem.FileNames[1];
+                    if (!string.IsNullOrWhiteSpace(path) && File.Exists(path))
+                    {
+                        return path;
+                    }
+                }
+                catch (ArgumentException)
+                {
+                }
+            }
+
+            return null;
         }
     }
 }

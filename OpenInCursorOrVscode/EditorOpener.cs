@@ -51,7 +51,9 @@ namespace OpenInCursorOrVscode
                 {
                     FileName = executablePath,
                     Arguments = "\"" + filePath + "\"",
-                    UseShellExecute = false
+                    UseShellExecute = false,
+                    CreateNoWindow = true,
+                    WindowStyle = ProcessWindowStyle.Hidden
                 });
                 return true;
             }
@@ -65,11 +67,20 @@ namespace OpenInCursorOrVscode
         private static string FindCursor()
         {
             string localAppData = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+            string programFiles = Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles);
+            string programFilesX86 = Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86);
+
             string[] candidates =
             {
                 Path.Combine(localAppData, "Programs", "cursor", "Cursor.exe"),
                 Path.Combine(localAppData, "cursor", "Cursor.exe"),
-                @"C:\Program Files\Cursor\Cursor.exe"
+                Path.Combine(programFiles, "Cursor", "Cursor.exe"),
+                Path.Combine(programFilesX86, "Cursor", "Cursor.exe"),
+                Path.Combine(programFiles, "cursor", "Cursor.exe"),
+                Path.Combine(programFilesX86, "cursor", "Cursor.exe"),
+                @"C:\Program Files\Cursor\Cursor.exe",
+                @"D:\Program Files (x86)\cursor\Cursor.exe",
+                @"D:\Program Files\Cursor\Cursor.exe"
             };
 
             foreach (string path in candidates)
@@ -80,7 +91,13 @@ namespace OpenInCursorOrVscode
                 }
             }
 
-            return FindInPath("cursor");
+            string fromAppPaths = FindFromAppPaths("Cursor.exe");
+            if (!string.IsNullOrEmpty(fromAppPaths))
+            {
+                return fromAppPaths;
+            }
+
+            return FindInPath("cursor", "Cursor.exe");
         }
 
         private static string FindVsCode()
@@ -94,7 +111,8 @@ namespace OpenInCursorOrVscode
                 Path.Combine(localAppData, "Programs", "Microsoft VS Code", "Code.exe"),
                 Path.Combine(programFiles, "Microsoft VS Code", "Code.exe"),
                 Path.Combine(programFilesX86, "Microsoft VS Code", "Code.exe"),
-                Path.Combine(programFiles, "Microsoft VS Code", "bin", "code.cmd")
+                @"D:\Program Files\Microsoft VS Code\Code.exe",
+                @"D:\Program Files (x86)\Microsoft VS Code\Code.exe"
             };
 
             foreach (string path in candidates)
@@ -111,7 +129,13 @@ namespace OpenInCursorOrVscode
                 return fromRegistry;
             }
 
-            return FindInPath("code");
+            string fromAppPaths = FindFromAppPaths("Code.exe");
+            if (!string.IsNullOrEmpty(fromAppPaths))
+            {
+                return fromAppPaths;
+            }
+
+            return FindInPath("code", "Code.exe");
         }
 
         private static string FindVsCodeFromRegistry()
@@ -123,7 +147,11 @@ namespace OpenInCursorOrVscode
                     string command = key?.GetValue(null) as string;
                     if (!string.IsNullOrEmpty(command))
                     {
-                        return Unquote(command.Split(' ')[0]);
+                        string path = Unquote(command.Split(' ')[0]);
+                        if (File.Exists(path))
+                        {
+                            return path;
+                        }
                     }
                 }
             }
@@ -134,15 +162,53 @@ namespace OpenInCursorOrVscode
             return null;
         }
 
-        private static string FindInPath(string commandName)
+        private static string FindFromAppPaths(string exeName)
+        {
+            string[] roots =
+            {
+                @"SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\" + exeName,
+                @"SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\App Paths\" + exeName
+            };
+
+            foreach (string root in roots)
+            {
+                try
+                {
+                    using (RegistryKey key = Registry.LocalMachine.OpenSubKey(root))
+                    {
+                        string path = key?.GetValue(null) as string;
+                        path = Unquote(path);
+                        if (!string.IsNullOrEmpty(path) && File.Exists(path))
+                        {
+                            return path;
+                        }
+                    }
+
+                    using (RegistryKey key = Registry.CurrentUser.OpenSubKey(root))
+                    {
+                        string path = key?.GetValue(null) as string;
+                        path = Unquote(path);
+                        if (!string.IsNullOrEmpty(path) && File.Exists(path))
+                        {
+                            return path;
+                        }
+                    }
+                }
+                catch
+                {
+                }
+            }
+
+            return null;
+        }
+
+        private static string FindInPath(string commandName, string executableFileName)
         {
             string pathVariable = Environment.GetEnvironmentVariable("PATH");
             if (string.IsNullOrEmpty(pathVariable))
             {
                 return null;
             }
-
-            string[] extensions = { ".exe", ".cmd", ".bat", "" };
 
             foreach (string folder in pathVariable.Split(';'))
             {
@@ -151,14 +217,51 @@ namespace OpenInCursorOrVscode
                     continue;
                 }
 
-                foreach (string extension in extensions)
+                string directory = folder.Trim();
+                string exeCandidate = Path.Combine(directory, executableFileName);
+                if (File.Exists(exeCandidate))
                 {
-                    string candidate = Path.Combine(folder.Trim(), commandName + extension);
-                    if (File.Exists(candidate))
+                    return exeCandidate;
+                }
+
+                string cmdCandidate = Path.Combine(directory, commandName + ".cmd");
+                if (File.Exists(cmdCandidate))
+                {
+                    string resolved = ResolveCmdToExecutable(cmdCandidate, executableFileName);
+                    if (!string.IsNullOrEmpty(resolved))
                     {
-                        return candidate;
+                        return resolved;
                     }
                 }
+            }
+
+            return null;
+        }
+
+        /// <summary>
+        /// code.cmd / cursor.cmd в PATH указывают на GUI .exe рядом с установкой.
+        /// Запускаем .exe напрямую, чтобы не мигало консольное окно.
+        /// </summary>
+        private static string ResolveCmdToExecutable(string cmdPath, string executableFileName)
+        {
+            string binDir = Path.GetDirectoryName(cmdPath);
+            if (string.IsNullOrEmpty(binDir))
+            {
+                return null;
+            }
+
+            // VS Code: ...\Microsoft VS Code\bin\code.cmd -> ...\Code.exe
+            string vsCodeStyle = Path.GetFullPath(Path.Combine(binDir, "..", executableFileName));
+            if (File.Exists(vsCodeStyle))
+            {
+                return vsCodeStyle;
+            }
+
+            // Cursor: ...\cursor\resources\app\bin\cursor.cmd -> ...\Cursor.exe
+            string cursorStyle = Path.GetFullPath(Path.Combine(binDir, "..", "..", "..", executableFileName));
+            if (File.Exists(cursorStyle))
+            {
+                return cursorStyle;
             }
 
             return null;

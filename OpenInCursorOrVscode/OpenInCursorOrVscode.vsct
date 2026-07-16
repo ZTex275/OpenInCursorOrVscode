@@ -1,10 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <CommandTable xmlns="http://schemas.microsoft.com/VisualStudio/2005-10-18/CommandTable" xmlns:xs="http://www.w3.org/2001/XMLSchema">
 
-  <Externs>
-    <Extern href="stdidcmd.h"/>
-    <Extern href="vsshlids.h"/>
-  </Externs>
+  <Extern href="stdidcmd.h"/>
+  <Extern href="vsshlids.h"/>
 
   <Commands package="guidOpenInCursorOrVscodePackage">
     <Groups>
@@ -23,12 +21,27 @@
     </Buttons>
   </Commands>
 
+  <CommandPlacements>
+    <!-- XAML text editor context menu -->
+    <CommandPlacement guid="guidOpenInCursorOrVscodePackageCmdSet" id="OpenInEditorContextMenuGroup" priority="0x0600">
+      <Parent guid="guidXamlUiCmds" id="IDM_XAML_EDITOR"/>
+    </CommandPlacement>
+    <!-- Solution Explorer file item (включая .xaml) -->
+    <CommandPlacement guid="guidOpenInCursorOrVscodePackageCmdSet" id="OpenInEditorContextMenuGroup" priority="0x0600">
+      <Parent guid="guidSHLMainMenu" id="IDM_VS_CTXT_ITEMNODE"/>
+    </CommandPlacement>
+  </CommandPlacements>
+
   <Symbols>
     <GuidSymbol name="guidOpenInCursorOrVscodePackage" value="{A7C3E1F4-9B2D-4F6A-8E5C-1D0B3A7F9E42}" />
 
     <GuidSymbol name="guidOpenInCursorOrVscodePackageCmdSet" value="{B8D4F2A5-0C3E-4A7B-9F6D-2E1C4B8A0F53}">
       <IDSymbol name="OpenInEditorCommandId" value="0x0100" />
       <IDSymbol name="OpenInEditorContextMenuGroup" value="0x1020" />
+    </GuidSymbol>
+
+    <GuidSymbol name="guidXamlUiCmds" value="{4C87B692-1202-46AA-B64C-EF01FAEC53DA}">
+      <IDSymbol name="IDM_XAML_EDITOR" value="0x103" />
     </GuidSymbol>
   </Symbols>
 </CommandTable>
