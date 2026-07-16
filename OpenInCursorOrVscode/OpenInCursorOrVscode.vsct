@@ -14,11 +14,16 @@
     <Buttons>
       <Button guid="guidOpenInCursorOrVscodePackageCmdSet" id="OpenInEditorCommandId" priority="0x0100" type="Button">
         <Parent guid="guidOpenInCursorOrVscodePackageCmdSet" id="OpenInEditorContextMenuGroup" />
+        <Icon guid="guidImages" id="bmpPic1" />
         <Strings>
           <ButtonText>Открыть в Cursor или Visual Studio Code</ButtonText>
         </Strings>
       </Button>
     </Buttons>
+
+    <Bitmaps>
+      <Bitmap guid="guidImages" href="Resources\OpenInEditorCommand.bmp" usedList="bmpPic1"/>
+    </Bitmaps>
   </Commands>
 
   <CommandPlacements>
@@ -42,6 +47,10 @@
 
     <GuidSymbol name="guidXamlUiCmds" value="{4C87B692-1202-46AA-B64C-EF01FAEC53DA}">
       <IDSymbol name="IDM_XAML_EDITOR" value="0x103" />
+    </GuidSymbol>
+
+    <GuidSymbol name="guidImages" value="{C1E8A4D2-7F3B-4E9A-91D6-5B2C8A0F4E71}">
+      <IDSymbol name="bmpPic1" value="1" />
     </GuidSymbol>
   </Symbols>
 </CommandTable>
