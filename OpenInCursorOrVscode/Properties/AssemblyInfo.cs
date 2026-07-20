@@ -6,7 +6,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
 [assembly: AssemblyProduct("OpenInCursorOrVscode")]
-[assembly: AssemblyCopyright("")]
+[assembly: AssemblyCopyright("Copyright © 2026 ZTex275")]
 [assembly: AssemblyTrademark("")]
 [assembly: ComVisible(false)]
 [assembly: Guid("8F4E2A91-3C5D-4B7E-9A1F-6D2E8B4C7F30")]

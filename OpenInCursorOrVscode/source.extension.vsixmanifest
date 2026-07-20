@@ -6,6 +6,7 @@
     <Description xml:space="preserve">Добавляет пункт контекстного меню редактора для открытия текущего файла в Cursor или Visual Studio Code.</Description>
     <Icon>Resources\Icon.png</Icon>
     <PreviewImage>Resources\PreviewImage.png</PreviewImage>
+    <License>LICENSE.txt</License>
   </Metadata>
   <Installation>
     <InstallationTarget Version="[17.0,20.0)" Id="Microsoft.VisualStudio.Community">
