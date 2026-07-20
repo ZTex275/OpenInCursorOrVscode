@@ -1,0 +1,65 @@
+{
+  "name": "open-in-visual-studio",
+  "displayName": "Открыть в Visual Studio",
+  "description": "Открывает текущий файл в Visual Studio 2026 из Cursor или Visual Studio Code.",
+  "version": "1.0.0",
+  "publisher": "local",
+  "engines": {
+    "vscode": "^1.85.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "activationEvents": [
+    "onCommand:openInVisualStudio.openFile"
+  ],
+  "main": "./out/extension.js",
+  "icon": "resources/icon.png",
+  "contributes": {
+    "commands": [
+      {
+        "command": "openInVisualStudio.openFile",
+        "title": "Открыть в Visual Studio",
+        "icon": {
+          "light": "resources/icon.png",
+          "dark": "resources/icon.png"
+        }
+      }
+    ],
+    "menus": {
+      "explorer/context": [
+        {
+          "command": "openInVisualStudio.openFile",
+          "group": "navigation@99",
+          "when": "resourceScheme == file && !explorerResourceIsFolder"
+        }
+      ],
+      "editor/context": [
+        {
+          "command": "openInVisualStudio.openFile",
+          "group": "navigation@99",
+          "when": "resourceScheme == file"
+        }
+      ],
+      "editor/title/context": [
+        {
+          "command": "openInVisualStudio.openFile",
+          "group": "navigation@99",
+          "when": "resourceScheme == file"
+        }
+      ]
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "package": "vsce package --allow-missing-repository"
+  },
+  "devDependencies": {
+    "@types/node": "^20.19.43",
+    "@types/vscode": "^1.85.0",
+    "@vscode/vsce": "^3.2.1",
+    "typescript": "^5.3.3"
+  }
+}

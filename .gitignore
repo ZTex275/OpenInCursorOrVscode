@@ -6,3 +6,6 @@ obj/
 *.cache
 packages/
 *.vsix
+node_modules/
+out/
+OpenInVisualStudio/*.vsix
