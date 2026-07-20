@@ -1,8 +1,8 @@
 {
   "name": "open-in-visual-studio",
   "displayName": "Открыть в Visual Studio",
-  "description": "Открывает текущий файл в Visual Studio 2026 из Cursor или Visual Studio Code.",
-  "version": "1.0.0",
+  "description": "Открывает текущий файл в Visual Studio 2026 или 2022 из Cursor или Visual Studio Code.",
+  "version": "1.0.1",
   "publisher": "local",
   "engines": {
     "vscode": "^1.85.0"

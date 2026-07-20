@@ -5,13 +5,15 @@ import { promisify } from "util";
 
 const execFileAsync = promisify(execFile);
 
+const VS_EDITIONS = ["Insiders", "Community", "Professional", "Enterprise"] as const;
+
 export type OpenResult =
   | { ok: true; editorName: string }
   | { ok: false; errorMessage: string };
 
 /**
  * Сначала используем уже запущенный Visual Studio (devenv),
- * иначе ищем и запускаем Visual Studio 2026.
+ * иначе ищем установленный: приоритет VS 2026, затем VS 2022.
  */
 export async function tryOpenInVisualStudio(filePath: string): Promise<OpenResult> {
   if (!filePath || !filePath.trim()) {
@@ -35,7 +37,7 @@ export async function tryOpenInVisualStudio(filePath: string): Promise<OpenResul
   return {
     ok: false,
     errorMessage:
-      "Visual Studio не найден. Установите Visual Studio 2026 или запустите devenv.exe.",
+      "Visual Studio не найден. Установите Visual Studio 2026 или 2022.",
   };
 }
 
@@ -93,54 +95,45 @@ async function findVisualStudioDevEnv(): Promise<string | undefined> {
     return fromVsWhere;
   }
 
-  const candidates = [
-    path.join(
-      process.env["ProgramFiles"] ?? "C:\\Program Files",
-      "Microsoft Visual Studio",
-      "18",
-      "Insiders",
-      "Common7",
-      "IDE",
-      "devenv.exe"
-    ),
-    path.join(
-      process.env["ProgramFiles"] ?? "C:\\Program Files",
-      "Microsoft Visual Studio",
-      "18",
-      "Community",
-      "Common7",
-      "IDE",
-      "devenv.exe"
-    ),
-    path.join(
-      process.env["ProgramFiles"] ?? "C:\\Program Files",
-      "Microsoft Visual Studio",
-      "18",
-      "Professional",
-      "Common7",
-      "IDE",
-      "devenv.exe"
-    ),
-    path.join(
-      process.env["ProgramFiles"] ?? "C:\\Program Files",
-      "Microsoft Visual Studio",
-      "18",
-      "Enterprise",
-      "Common7",
-      "IDE",
-      "devenv.exe"
-    ),
-    "C:\\Program Files\\Microsoft Visual Studio\\18\\Insiders\\Common7\\IDE\\devenv.exe",
-    "D:\\Program Files\\Microsoft Visual Studio\\18\\Insiders\\Common7\\IDE\\devenv.exe",
-  ];
-
-  for (const candidate of candidates) {
+  for (const candidate of buildKnownDevEnvCandidates()) {
     if (fs.existsSync(candidate)) {
       return candidate;
     }
   }
 
   return undefined;
+}
+
+function buildKnownDevEnvCandidates(): string[] {
+  const programFiles = process.env["ProgramFiles"] ?? "C:\\Program Files";
+  const roots = [programFiles, "C:\\Program Files", "D:\\Program Files"];
+  // 18 = VS 2026, 17 = VS 2022
+  const majorVersions = ["18", "17"];
+  const candidates: string[] = [];
+  const seen = new Set<string>();
+
+  for (const root of roots) {
+    for (const major of majorVersions) {
+      for (const edition of VS_EDITIONS) {
+        const candidate = path.join(
+          root,
+          "Microsoft Visual Studio",
+          major,
+          edition,
+          "Common7",
+          "IDE",
+          "devenv.exe"
+        );
+        const normalized = path.normalize(candidate);
+        if (!seen.has(normalized.toLowerCase())) {
+          seen.add(normalized.toLowerCase());
+          candidates.push(normalized);
+        }
+      }
+    }
+  }
+
+  return candidates;
 }
 
 async function findViaVsWhere(): Promise<string | undefined> {
@@ -155,28 +148,32 @@ async function findViaVsWhere(): Promise<string | undefined> {
     return undefined;
   }
 
-  try {
-    // Предпочитаем VS 2026 / product line 18, иначе — последнюю установленную.
-    const { stdout: preferred } = await execFileAsync(
-      vswhere,
-      [
-        "-latest",
-        "-products",
-        "*",
-        "-version",
-        "[18.0,19.0)",
-        "-property",
-        "productPath",
-      ],
-      { windowsHide: true, timeout: 8000 }
-    );
+  // Сначала VS 2026 (18.x), затем VS 2022 (17.x), затем любая последняя.
+  const versionRanges = ["[18.0,19.0)", "[17.0,18.0)"];
 
-    const preferredPath = preferred.trim();
-    if (preferredPath && fs.existsSync(preferredPath)) {
-      return preferredPath;
+  for (const version of versionRanges) {
+    try {
+      const { stdout } = await execFileAsync(
+        vswhere,
+        [
+          "-latest",
+          "-products",
+          "*",
+          "-version",
+          version,
+          "-property",
+          "productPath",
+        ],
+        { windowsHide: true, timeout: 8000 }
+      );
+
+      const productPath = stdout.trim();
+      if (productPath && fs.existsSync(productPath)) {
+        return productPath;
+      }
+    } catch {
+      // Нет установки в этом диапазоне версий.
     }
-  } catch {
-    // Нет подходящей версии 18.x — пробуем любую последнюю.
   }
 
   try {
