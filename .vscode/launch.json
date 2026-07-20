@@ -1,0 +1,84 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "OpenInVisualStudio (Release)",
+      "type": "extensionHost",
+      "request": "launch",
+      "runtimeExecutable": "${execPath}",
+      "args": [
+        "--extensionDevelopmentPath=${workspaceFolder}/OpenInVisualStudio"
+      ],
+      "outFiles": [
+        "${workspaceFolder}/OpenInVisualStudio/out/**/*.js"
+      ],
+      "preLaunchTask": "build: OpenInVisualStudio (Release)"
+    },
+    {
+      "name": "OpenInCursorOrVscode → Visual Studio Exp (Release)",
+      "type": "node",
+      "request": "launch",
+      "runtimeExecutable": "powershell",
+      "runtimeArgs": [
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "${workspaceFolder}/scripts/Launch-VsExperimental.ps1",
+        "-Configuration",
+        "Release"
+      ],
+      "console": "integratedTerminal",
+      "internalConsoleOptions": "neverOpen",
+      "cwd": "${workspaceFolder}"
+    },
+    {
+      "name": "OpenInVisualStudio (Release, after build)",
+      "type": "extensionHost",
+      "request": "launch",
+      "runtimeExecutable": "${execPath}",
+      "args": [
+        "--extensionDevelopmentPath=${workspaceFolder}/OpenInVisualStudio"
+      ],
+      "outFiles": [
+        "${workspaceFolder}/OpenInVisualStudio/out/**/*.js"
+      ],
+      "presentation": {
+        "hidden": true
+      }
+    },
+    {
+      "name": "Visual Studio Exp (Release, after build)",
+      "type": "node",
+      "request": "launch",
+      "runtimeExecutable": "powershell",
+      "runtimeArgs": [
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "${workspaceFolder}/scripts/Launch-VsExperimental.ps1",
+        "-Configuration",
+        "Release",
+        "-SkipBuild"
+      ],
+      "console": "integratedTerminal",
+      "internalConsoleOptions": "neverOpen",
+      "cwd": "${workspaceFolder}",
+      "presentation": {
+        "hidden": true
+      }
+    }
+  ],
+  "compounds": [
+    {
+      "name": "Both (Release)",
+      "configurations": [
+        "OpenInVisualStudio (Release, after build)",
+        "Visual Studio Exp (Release, after build)"
+      ],
+      "preLaunchTask": "build: All (Release)",
+      "stopAll": true
+    }
+  ]
+}
