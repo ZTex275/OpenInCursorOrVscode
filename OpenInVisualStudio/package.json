@@ -2,7 +2,7 @@
   "name": "open-in-visual-studio",
   "displayName": "Открыть в Visual Studio",
   "description": "Открывает текущий файл в Visual Studio 2026 или 2022 из Cursor или Visual Studio Code.",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "publisher": "local",
   "engines": {
     "vscode": "^1.85.0"
@@ -19,11 +19,7 @@
     "commands": [
       {
         "command": "openInVisualStudio.openFile",
-        "title": "Открыть в Visual Studio",
-        "icon": {
-          "light": "resources/icon.png",
-          "dark": "resources/icon.png"
-        }
+        "title": "Открыть в Visual Studio"
       }
     ],
     "menus": {
