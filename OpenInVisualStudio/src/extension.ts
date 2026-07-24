@@ -7,7 +7,7 @@ export function activate(context: vscode.ExtensionContext): void {
     async (uri?: vscode.Uri) => {
       const filePath = resolveTargetFilePath(uri);
       if (!filePath) {
-        void vscode.window.showWarningMessage("Файл не выбран.");
+        void vscode.window.showWarningMessage(vscode.l10n.t("No file selected."));
         return;
       }
 

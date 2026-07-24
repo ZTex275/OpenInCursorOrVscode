@@ -1,0 +1,5 @@
+{
+  "extension.displayName": "Открыть в Visual Studio 2022-2026",
+  "extension.description": "Открывает текущий файл в Visual Studio 2026 или 2022 из Cursor или Visual Studio Code.",
+  "command.openFile.title": "Открыть в Visual Studio"
+}

@@ -47,9 +47,19 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="EditorOpener.cs" />
+    <Compile Include="LocalizedStrings.cs" />
     <Compile Include="OpenInEditorCommand.cs" />
     <Compile Include="OpenInCursorOrVscodePackage.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="VSPackage.resx">
+      <MergeWithCTO>true</MergeWithCTO>
+      <ManifestResourceName>VSPackage</ManifestResourceName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="VSPackage.ru-RU.resx">
+      <DependentUpon>VSPackage.resx</DependentUpon>
+    </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
     <None Include="source.extension.vsixmanifest">
@@ -75,6 +85,7 @@
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Design" />
+    <Reference Include="System.Windows.Forms" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.VisualStudio.SDK" Version="17.0.32112.339" ExcludeAssets="runtime" />

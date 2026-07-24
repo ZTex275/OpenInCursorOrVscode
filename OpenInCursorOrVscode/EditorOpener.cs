@@ -14,13 +14,13 @@ namespace OpenInCursorOrVscode
 
             if (string.IsNullOrWhiteSpace(filePath))
             {
-                errorMessage = "Файл не выбран.";
+                errorMessage = LocalizedStrings.FileNotSelected;
                 return false;
             }
 
             if (!File.Exists(filePath))
             {
-                errorMessage = "Файл не найден: " + filePath;
+                errorMessage = LocalizedStrings.FileNotFound(filePath);
                 return false;
             }
 
@@ -57,7 +57,7 @@ namespace OpenInCursorOrVscode
                 return Launch(vscodePath, filePath, "Visual Studio Code", out editorName, out errorMessage);
             }
 
-            errorMessage = "Не найдены Cursor и Visual Studio Code. Установите один из редакторов.";
+            errorMessage = LocalizedStrings.EditorsNotFound;
             return false;
         }
 
@@ -141,7 +141,7 @@ namespace OpenInCursorOrVscode
             }
             catch (Exception ex)
             {
-                errorMessage = "Не удалось открыть файл в " + name + ": " + ex.Message;
+                errorMessage = LocalizedStrings.LaunchFailed(name, ex.Message);
                 return false;
             }
         }

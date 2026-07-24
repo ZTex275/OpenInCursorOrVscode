@@ -46,7 +46,7 @@ namespace OpenInCursorOrVscode
                 VsShellUtilities.ShowMessageBox(
                     package,
                     errorMessage,
-                    "Открыть в Cursor или Visual Studio Code",
+                    LocalizedStrings.CommandTitle,
                     OLEMSGICON.OLEMSGICON_WARNING,
                     OLEMSGBUTTON.OLEMSGBUTTON_OK,
                     OLEMSGDEFBUTTON.OLEMSGDEFBUTTON_FIRST);

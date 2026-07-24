@@ -1,0 +1,6 @@
+{
+  "No file selected.": "Файл не выбран.",
+  "File not found: {0}": "Файл не найден: {0}",
+  "Visual Studio was not found. Install Visual Studio 2026 or 2022.": "Visual Studio не найден. Установите Visual Studio 2026 или 2022.",
+  "Could not open the file in Visual Studio: {0}": "Не удалось открыть файл в Visual Studio: {0}"
+}

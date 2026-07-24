@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PackageManifest Version="2.0.0" xmlns="http://schemas.microsoft.com/developer/vsx-schema/2011" xmlns:d="http://schemas.microsoft.com/developer/vsx-schema-design/2011">
   <Metadata>
-    <Identity Id="OpenInCursorOrVscode.8F4E2A91-3C5D-4B7E-9A1F-6D2E8B4C7F30" Version="2.0.2" Language="ru-RU" Publisher="ZTex275" />
-    <DisplayName>Открыть в Cursor или VS Code</DisplayName>
-    <Description xml:space="preserve">Добавляет пункт контекстного меню редактора для открытия текущего файла в Cursor или Visual Studio Code.</Description>
+    <Identity Id="OpenInCursorOrVscode.8F4E2A91-3C5D-4B7E-9A1F-6D2E8B4C7F30" Version="2.1.0" Language="en-US" Publisher="ZTex275" />
+    <DisplayName>Open in Cursor or VS Code</DisplayName>
+    <Description xml:space="preserve">Adds an editor context menu command to open the current file in Cursor or Visual Studio Code.</Description>
+    <License>LICENSE.txt</License>
     <Icon>Resources\Icon.png</Icon>
     <PreviewImage>Resources\PreviewImage.png</PreviewImage>
-    <License>LICENSE.txt</License>
   </Metadata>
   <Installation>
     <InstallationTarget Version="[17.0,20.0)" Id="Microsoft.VisualStudio.Community">

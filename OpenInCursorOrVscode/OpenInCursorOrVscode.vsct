@@ -16,7 +16,7 @@
         <Parent guid="guidOpenInCursorOrVscodePackageCmdSet" id="OpenInEditorContextMenuGroup" />
         <Icon guid="guidImages" id="bmpPic1" />
         <Strings>
-          <ButtonText>Открыть в Cursor или Visual Studio Code</ButtonText>
+          <ButtonText>#101</ButtonText>
         </Strings>
       </Button>
     </Buttons>

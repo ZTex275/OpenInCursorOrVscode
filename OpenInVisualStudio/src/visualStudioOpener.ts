@@ -2,6 +2,7 @@ import { spawn, execFile } from "child_process";
 import * as fs from "fs";
 import * as path from "path";
 import { promisify } from "util";
+import * as vscode from "vscode";
 
 const execFileAsync = promisify(execFile);
 
@@ -12,16 +13,19 @@ export type OpenResult =
   | { ok: false; errorMessage: string };
 
 /**
- * Сначала используем уже запущенный Visual Studio (devenv),
- * иначе ищем установленный: приоритет VS 2026, затем VS 2022.
+ * Prefer a running Visual Studio (devenv) instance;
+ * otherwise look for an install: VS 2026 first, then VS 2022.
  */
 export async function tryOpenInVisualStudio(filePath: string): Promise<OpenResult> {
   if (!filePath || !filePath.trim()) {
-    return { ok: false, errorMessage: "Файл не выбран." };
+    return { ok: false, errorMessage: vscode.l10n.t("No file selected.") };
   }
 
   if (!fs.existsSync(filePath)) {
-    return { ok: false, errorMessage: `Файл не найден: ${filePath}` };
+    return {
+      ok: false,
+      errorMessage: vscode.l10n.t("File not found: {0}", filePath),
+    };
   }
 
   const runningPath = await findRunningDevEnvPath();
@@ -36,14 +40,15 @@ export async function tryOpenInVisualStudio(filePath: string): Promise<OpenResul
 
   return {
     ok: false,
-    errorMessage:
-      "Visual Studio не найден. Установите Visual Studio 2026 или 2022.",
+    errorMessage: vscode.l10n.t(
+      "Visual Studio was not found. Install Visual Studio 2026 or 2022."
+    ),
   };
 }
 
 function launch(devenvPath: string, filePath: string): OpenResult {
   try {
-    // /edit открывает файл в уже запущенном экземпляре, если он есть.
+    // /edit opens the file in an existing instance when possible.
     const child = spawn(devenvPath, ["/edit", filePath], {
       detached: true,
       stdio: "ignore",
@@ -55,7 +60,10 @@ function launch(devenvPath: string, filePath: string): OpenResult {
     const message = error instanceof Error ? error.message : String(error);
     return {
       ok: false,
-      errorMessage: `Не удалось открыть файл в Visual Studio: ${message}`,
+      errorMessage: vscode.l10n.t(
+        "Could not open the file in Visual Studio: {0}",
+        message
+      ),
     };
   }
 }

@@ -1,8 +1,8 @@
 {
-  "name": "open-in-visual-studio",
-  "displayName": "Открыть в Visual Studio",
-  "description": "Открывает текущий файл в Visual Studio 2026 или 2022 из Cursor или Visual Studio Code.",
-  "version": "2.0.0",
+  "name": "open-in-visual-studio-2022-2026",
+  "displayName": "%extension.displayName%",
+  "description": "%extension.description%",
+  "version": "2.1.0",
   "publisher": "ZTex275",
   "license": "SEE LICENSE IN LICENSE.txt",
   "engines": {
@@ -15,12 +15,13 @@
     "onCommand:openInVisualStudio.openFile"
   ],
   "main": "./out/extension.js",
+  "l10n": "./l10n",
   "icon": "resources/icon.png",
   "contributes": {
     "commands": [
       {
         "command": "openInVisualStudio.openFile",
-        "title": "Открыть в Visual Studio"
+        "title": "%command.openFile.title%"
       }
     ],
     "menus": {

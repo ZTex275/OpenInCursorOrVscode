@@ -1,14 +1,13 @@
 using System;
 using System.Runtime.InteropServices;
 using System.Threading;
-using System.Threading.Tasks;
 using Microsoft.VisualStudio.Shell;
 using Task = System.Threading.Tasks.Task;
 
 namespace OpenInCursorOrVscode
 {
     [PackageRegistration(UseManagedResourcesOnly = true, AllowsBackgroundLoading = true)]
-    [InstalledProductRegistration("Открыть в Cursor или VS Code", "Открывает текущий файл в Cursor или Visual Studio Code", "1.0")]
+    [InstalledProductRegistration("#110", "#112", "2.1")]
     [ProvideMenuResource("Menus.ctmenu", 1)]
     [Guid(OpenInCursorOrVscodePackage.PackageGuidString)]
     public sealed class OpenInCursorOrVscodePackage : AsyncPackage
